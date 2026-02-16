@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SenTekse | Hardware Catalogue</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['DM Sans', 'sans-serif'], serif: ['Playfair Display', 'serif'] },
+                    colors: { 'ink': '#0A0A0A', 'paper': '#F5F5F7', 'accent': '#673D81' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { cursor: none; overflow-x: hidden; }
+        .cursor-dot, .cursor-outline { position: fixed; top: 0; left: 0; transform: translate(-50%, -50%); border-radius: 50%; z-index: 9999; pointer-events: none; mix-blend-mode: difference; }
+        .cursor-dot { width: 8px; height: 8px; background-color: white; }
+        .cursor-outline { width: 40px; height: 40px; border: 1px solid rgba(255, 255, 255, 0.6); transition: all 0.2s; }
+        .reveal-wrapper { overflow: hidden; display: block; }
+        .reveal-text { transform: translateY(110%); opacity: 0; visibility: hidden; will-change: transform, opacity; }
+        .fade-up { opacity: 0; visibility: hidden; transform: translateY(40px); }
+        .parallax-img { transform: scale(1.2); will-change: transform; width: 100%; height: 100%; object-fit: cover; }
+        body.hovering .cursor-outline { width: 70px; height: 70px; background-color: rgba(255, 255, 255, 0.1); border-color: transparent; }
+    </style>
+</head>
+<body class="bg-paper text-ink antialiased">
+    <div class="cursor-dot hidden lg:block"></div>
+    <div class="cursor-outline hidden lg:block"></div>
+
+    <!-- MOBILE MENU OVERLAY -->
+    <div id="mobile-menu" class="fixed inset-0 bg-ink z-40 translate-x-full flex flex-col justify-center items-center text-white transition-transform duration-500 ease-in-out">
+        <a href="index.html" class="text-3xl font-serif mb-8 hover:text-accent transition-colors hover-trigger">Home</a>
+        <a href="products.html" class="text-3xl font-serif mb-8 hover:text-accent transition-colors hover-trigger">Products</a>
+        <a href="specs.html" class="text-3xl font-serif mb-8 hover:text-accent transition-colors hover-trigger">Specs</a>
+        <a href="insights.html" class="text-3xl font-serif mb-8 text-accent transition-colors hover-trigger">Insights</a>
+    </div>
+
+    <!-- UPDATED NAV -->
+    <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200 top-0 py-5 transition-all duration-300">
+        <div class="max-w-[1600px] mx-auto px-6 lg:px-12 flex justify-between items-center">
+            <a href="index.html" class="font-serif font-black text-2xl tracking-tighter hover-trigger relative z-50 text-ink">
+                <!-- SenTekse. -->
+                <img src="./assets/image/logo.png" alt="">
+            </a>
+            
+            <div class="hidden lg:flex space-x-12">
+                <a href="products.html" class="text-xs font-bold uppercase tracking-[0.15em] text-ink hover:text-accent transition-colors hover-trigger">Products</a>
+                <a href="specs.html" class="text-xs font-bold uppercase tracking-[0.15em] text-ink hover:text-accent transition-colors hover-trigger">Specs</a>
+                <a href="insights.html" class="text-xs font-bold uppercase tracking-[0.15em] text-accent hover-trigger">Insights</a>
+            </div>
+
+            <a href="contact.html" class="hidden lg:block text-xs font-bold uppercase tracking-[0.15em] bg-ink text-white px-8 py-3 hover:bg-accent transition-all hover-trigger">Get in Touch</a>
+            
+            <button id="mobile-toggle" class="lg:hidden text-2xl relative z-50 text-ink hover-trigger"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <header class="relative pt-48 pb-24 px-6 lg:px-12 bg-ink text-white min-h-[60vh] flex flex-col justify-center">
+        <div class="max-w-[1600px] mx-auto w-full">
+            <div class="reveal-wrapper mb-8">
+                <h1 class="reveal-text font-serif font-light text-[8vw] leading-[0.9] tracking-tight">Industrial <span class="text-accent italic">Hardware.</span></h1>
+            </div>
+            <p class="text-xl lg:text-2xl text-gray-400 max-w-2xl fade-up font-light">
+                Robust Single Pair Ethernet components designed for the harsh edge of the industrial network.
+            </p>
+        </div>
+    </header>
+
+    <!-- PRODUCT LIST -->
+    <main class="py-24 px-6 lg:px-12">
+        <div class="max-w-[1600px] mx-auto space-y-32">
+            
+            <!-- PRODUCT 1 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center group">
+                <div class="order-2 lg:order-1">
+                    <span class="text-accent font-bold uppercase tracking-widest text-xs mb-4 block fade-up">Switching Infrastructure</span>
+                    <h2 class="font-serif text-5xl mb-6 fade-up">SPE Network Switches</h2>
+                    <p class="text-gray-600 text-lg mb-8 fade-up">High-density, low-power switches built for process control. Features robust DIN-rail mountable designs and extended temperature ranges.</p>
+                    <ul class="space-y-4 mb-8 fade-up">
+                        <li class="flex items-center gap-4 border-b border-gray-200 pb-2"><i class="fa-solid fa-check text-accent"></i> <span>10BASE-T1L Compliant</span></li>
+                        <li class="flex items-center gap-4 border-b border-gray-200 pb-2"><i class="fa-solid fa-check text-accent"></i> <span>Unmanaged & Managed Options</span></li>
+                        <li class="flex items-center gap-4 border-b border-gray-200 pb-2"><i class="fa-solid fa-check text-accent"></i> <span>IP67 Rated Enclosures</span></li>
+                    </ul>
+                    <a href="#" class="inline-block bg-ink text-white px-8 py-4 font-bold uppercase tracking-widest text-xs hover:bg-accent transition-colors hover-trigger fade-up">Download Datasheet</a>
+                </div>
+                <div class="order-1 lg:order-2 h-[600px] overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1544197150-b99a580bbcbf?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" class="parallax-img grayscale group-hover:grayscale-0 transition-all duration-700">
+                </div>
+            </div>
+
+            <!-- PRODUCT 2 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center group">
+                <div class="h-[600px] overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" class="parallax-img grayscale group-hover:grayscale-0 transition-all duration-700">
+                </div>
+                <div>
+                    <span class="text-accent font-bold uppercase tracking-widest text-xs mb-4 block fade-up">Edge Connectivity</span>
+                    <h2 class="font-serif text-5xl mb-6 fade-up">End Point Devices</h2>
+                    <p class="text-gray-600 text-lg mb-8 fade-up">Direct IP addressability for sensors and actuators. Eliminate gateways and complex translation layers.</p>
+                    <ul class="space-y-4 mb-8 fade-up">
+                        <li class="flex items-center gap-4 border-b border-gray-200 pb-2"><i class="fa-solid fa-check text-accent"></i> <span>Built-in SPoE Support</span></li>
+                        <li class="flex items-center gap-4 border-b border-gray-200 pb-2"><i class="fa-solid fa-check text-accent"></i> <span>Compact Form Factors</span></li>
+                        <li class="flex items-center gap-4 border-b border-gray-200 pb-2"><i class="fa-solid fa-check text-accent"></i> <span>Zero-Touch Provisioning</span></li>
+                    </ul>
+                    <a href="#" class="inline-block bg-ink text-white px-8 py-4 font-bold uppercase tracking-widest text-xs hover:bg-accent transition-colors hover-trigger fade-up">Download Datasheet</a>
+                </div>
+            </div>
+
+             <!-- PRODUCT 3 -->
+             <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center group">
+                <div class="order-2 lg:order-1">
+                    <span class="text-accent font-bold uppercase tracking-widest text-xs mb-4 block fade-up">Integration</span>
+                    <h2 class="font-serif text-5xl mb-6 fade-up">Media Converters</h2>
+                    <p class="text-gray-600 text-lg mb-8 fade-up">Bridge the gap between legacy RJ45 infrastructure and modern Single Pair Ethernet cabling.</p>
+                    <ul class="space-y-4 mb-8 fade-up">
+                        <li class="flex items-center gap-4 border-b border-gray-200 pb-2"><i class="fa-solid fa-check text-accent"></i> <span>BASE-T to T1L Conversion</span></li>
+                        <li class="flex items-center gap-4 border-b border-gray-200 pb-2"><i class="fa-solid fa-check text-accent"></i> <span>USB to SPE Diagnostics</span></li>
+                        <li class="flex items-center gap-4 border-b border-gray-200 pb-2"><i class="fa-solid fa-check text-accent"></i> <span>Plug-and-Play</span></li>
+                    </ul>
+                    <a href="#" class="inline-block bg-ink text-white px-8 py-4 font-bold uppercase tracking-widest text-xs hover:bg-accent transition-colors hover-trigger fade-up">Download Datasheet</a>
+                </div>
+                <div class="order-1 lg:order-2 h-[600px] overflow-hidden relative">
+                    <img src="https://images.unsplash.com/photo-1601597111158-2fceff292cd4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" class="parallax-img grayscale group-hover:grayscale-0 transition-all duration-700">
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer id="contact" class="bg-ink text-white pt-32 pb-12 px-6 lg:px-12 rounded-t-[3rem] -mt-12 relative z-20">
+        <div class="max-w-[1600px] mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-32">
+                <div>
+                    <h2 class="font-serif text-6xl lg:text-8xl mb-12">Let's build<br><span class="text-gray-600">the network.</span></h2>
+                    <a href="mailto:cdiminico@sentekse.com" class="text-2xl lg:text-4xl border-b border-gray-700 pb-2 hover:text-accent hover:border-accent transition-colors hover-trigger inline-block mb-6">
+                        cdiminico@sentekse.com
+                    </a>
+                    <p class="text-gray-400 font-sans text-lg tracking-widest">+1 978 758 0764</p>
+                </div>
+                <div class="flex flex-col justify-end items-start lg:items-end">
+                    <p class="text-xl max-w-md text-right text-gray-400 font-light leading-relaxed">
+                        Design and manufacture of Single Pair Ethernet devices for Industrial process control and building automation.
+                    </p>
+                    <div class="mt-12 flex gap-4">
+                        <a href="#" class="w-12 h-12 rounded-full border border-gray-700 flex items-center justify-center hover:bg-white hover:text-black transition-all hover-trigger">
+                            <i class="fa-brands fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="w-12 h-12 rounded-full border border-gray-700 flex items-center justify-center hover:bg-white hover:text-black transition-all hover-trigger">
+                            <i class="fa-brands fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs font-bold uppercase tracking-widest text-gray-500">
+                <p>&copy; 2026 SenTekse.</p>
+                <div class="flex gap-8 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-white transition-colors hover-trigger">Privacy</a>
+                    <a href="#" class="hover:text-white transition-colors hover-trigger">Terms</a>
+                    <a href="#" class="hover:text-white transition-colors hover-trigger">Sitemap</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+        // [Standard Animation Script Reuse]
+        document.querySelectorAll('.reveal-text').forEach(t => gsap.to(t, { autoAlpha: 1, y: 0, duration: 1.4, ease: "power4.out", scrollTrigger: { trigger: t, start: "top 85%" } }));
+        document.querySelectorAll('.fade-up').forEach(el => gsap.fromTo(el, { autoAlpha: 0, y: 60 }, { autoAlpha: 1, y: 0, duration: 1.2, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 90%" } }));
+        document.querySelectorAll('.parallax-img').forEach(img => gsap.to(img, { scale: 1.05, y: "10%", ease: "none", scrollTrigger: { trigger: img.parentElement, start: "top bottom", end: "bottom top", scrub: 1 } }));
+        
+        // Cursor Logic
+        const cursorDot = document.querySelector('.cursor-dot'), cursorOutline = document.querySelector('.cursor-outline');
+        if (window.matchMedia("(pointer: fine)").matches) {
+            window.addEventListener("mousemove", e => {
+                cursorDot.style.left = `${e.clientX}px`; cursorDot.style.top = `${e.clientY}px`;
+                gsap.to(cursorOutline, { x: e.clientX, y: e.clientY, duration: 0.2, ease: "power2.out" });
+            });
+            document.querySelectorAll('.hover-trigger').forEach(t => {
+                t.addEventListener("mouseenter", () => { gsap.to(cursorOutline, { scale: 1.5 }); gsap.to(cursorDot, { autoAlpha: 0 }); });
+                t.addEventListener("mouseleave", () => { gsap.to(cursorOutline, { scale: 1 }); gsap.to(cursorDot, { autoAlpha: 1 }); });
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SenTekse | Intelligent Infrastructure</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['DM Sans', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        'ink': '#0A0A0A',
+                        'paper': '#F5F5F7',
+                        'accent': '#673D81', // Deep Industrial Blue
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        body { 
+            cursor: none; 
+            overflow-x: hidden;
+        }
+
+        /* Custom Cursor */
+        .cursor-dot,
+        .cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+            mix-blend-mode: difference;
+        }
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: white;
+        }
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+        }
+        
+        /* Text Reveal Masking - Improved to prevent FOUC */
+        .reveal-wrapper {
+            overflow: hidden;
+            display: block;
+        }
+        .reveal-text {
+            transform: translateY(110%);
+            opacity: 0; 
+            visibility: hidden; /* Key fix for FOUC */
+            display: block;
+            will-change: transform, opacity;
+        }
+        .fade-up {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(40px);
+        }
+
+        /* Image Parallax Containers */
+        .img-container {
+            overflow: hidden;
+            position: relative;
+        }
+        .parallax-img {
+            transform: scale(1.3); 
+            will-change: transform;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Hover States for Cursor */
+        body.hovering .cursor-outline {
+            width: 70px;
+            height: 70px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: transparent;
+        }
+
+        /* Video Styles */
+        video {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="bg-paper text-ink antialiased">
+
+    <!-- CUSTOM CURSOR -->
+    <div class="cursor-dot hidden lg:block"></div>
+    <div class="cursor-outline hidden lg:block"></div>
+
+    <!-- MOBILE MENU OVERLAY -->
+    <div id="mobile-menu" class="fixed inset-0 bg-ink z-40 translate-x-full flex flex-col justify-center items-center text-white transition-transform duration-500 ease-in-out">
+        <a href="index.html" class="text-3xl font-serif mb-8 hover:text-accent transition-colors hover-trigger">Home</a>
+        <a href="products.html" class="text-3xl font-serif mb-8 hover:text-accent transition-colors hover-trigger">Products</a>
+        <a href="specs.html" class="text-3xl font-serif mb-8 hover:text-accent transition-colors hover-trigger">Specs</a>
+        <a href="insights.html" class="text-3xl font-serif mb-8 text-accent transition-colors hover-trigger">Insights</a>
+    </div>
+
+    <!-- UPDATED NAV -->
+    <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200 top-0 py-5 transition-all duration-300">
+        <div class="max-w-[1600px] mx-auto px-6 lg:px-12 flex justify-between items-center">
+            <a href="index.html" class="font-serif font-black text-2xl tracking-tighter hover-trigger relative z-50 text-ink">
+                <!-- SenTekse. -->
+                <img src="./assets/image/logo.png" alt="">
+            </a>
+            
+            <div class="hidden lg:flex space-x-12">
+                <a href="products.html" class="text-xs font-bold uppercase tracking-[0.15em] text-ink hover:text-accent transition-colors hover-trigger">Products</a>
+                <a href="specs.html" class="text-xs font-bold uppercase tracking-[0.15em] text-ink hover:text-accent transition-colors hover-trigger">Specs</a>
+                <a href="insights.html" class="text-xs font-bold uppercase tracking-[0.15em] text-accent hover-trigger">Insights</a>
+            </div>
+
+            <a href="contact.html" class="hidden lg:block text-xs font-bold uppercase tracking-[0.15em] bg-ink text-white px-8 py-3 hover:bg-accent transition-all hover-trigger">Get in Touch</a>
+            
+            <button id="mobile-toggle" class="lg:hidden text-2xl relative z-50 text-ink hover-trigger"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="relative min-h-screen pt-32 pb-20 px-6 lg:px-12 flex flex-col justify-center overflow-hidden">
+        
+        <!-- Video Background - Updated to Industrial Abstract -->
+        <div class="absolute inset-0 z-0">
+             <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80">
+                 <!-- Modern Industrial Abstract Loop -->
+                <source src="https://assets.mixkit.co/videos/preview/mixkit-software-developer-working-on-code-monitor-close-up-1728-large.mp4" type="video/mp4">
+            </video>
+            <!-- White Overlay for Text Readability -->
+            <div class="absolute inset-0 bg-white/90"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-white via-transparent to-white/50"></div>
+        </div>
+
+        <div class="max-w-[1600px] mx-auto w-full relative z-10">
+            
+            <!-- Headline -->
+            <div class="mb-16 lg:mb-24">
+                <div class="reveal-wrapper">
+                    <h1 class="reveal-text font-serif font-light text-[13vw] leading-[0.8] tracking-tight text-ink">
+                        Connect the
+                    </h1>
+                </div>
+                <div class="reveal-wrapper">
+                    <h1 class="reveal-text font-serif font-light text-[13vw] leading-[0.8] tracking-tight text-accent italic pr-4">
+                        Unconnected.
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Intro Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 border-t border-gray-300 pt-12 anim-border-top">
+                <div class="lg:col-span-4 fade-up">
+                    <span class="block text-xs font-bold uppercase tracking-widest text-accent mb-4 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-accent rounded-full animate-pulse"></span>
+                        Core Standard
+                    </span>
+                    <h2 class="font-serif text-4xl">IEEE 802.3bu</h2>
+                </div>
+                <div class="lg:col-span-5 fade-up">
+                    <p class="text-xl lg:text-2xl text-gray-800 leading-relaxed font-light">
+                        Single Pair Ethernet (SPE) switches poised to enable a new class of low power devices. Networking AI machines to sensor telemetry for the Industrial IoT.
+                    </p>
+                </div>
+                <div class="lg:col-span-3 flex lg:justify-end items-start fade-up">
+                    <a href="#products" class="group flex items-center gap-4 hover-trigger cursor-none">
+                        <div class="w-16 h-16 rounded-full border border-gray-300 flex items-center justify-center group-hover:bg-accent group-hover:border-accent group-hover:text-white transition-all duration-300">
+                            <i class="fa-solid fa-arrow-down transform group-hover:translate-y-1 transition-transform"></i>
+                        </div>
+                        <span class="text-xs font-bold uppercase tracking-widest">Explore</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SPECS SCROLL SECTION -->
+    <section id="specs" class="py-32 bg-ink text-white overflow-hidden">
+        <div class="max-w-[1600px] mx-auto px-6 lg:px-12">
+            
+            <div class="flex flex-col lg:flex-row items-baseline justify-between mb-24 border-b border-white/10 pb-8 anim-border-bottom">
+                <h2 class="font-serif text-5xl lg:text-7xl">Performance.</h2>
+                <div class="flex items-center gap-3">
+                    <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                    <p class="font-sans text-gray-400 text-sm tracking-widest uppercase">10BASE-T1L Live Specs</p>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-px bg-white/10 border border-white/10">
+                
+                <!-- Stat 1 -->
+                <div class="bg-ink p-12 lg:p-16 hover:bg-white/5 transition-colors group border-b lg:border-b-0 lg:border-r border-white/10 hover-trigger relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-8 opacity-20 group-hover:opacity-100 transition-opacity transform group-hover:rotate-45 duration-500">
+                        <i class="fa-solid fa-arrow-up-right text-3xl"></i>
+                    </div>
+                    <i class="fa-solid fa-ruler-horizontal text-4xl mb-12 text-accent"></i>
+                    <div class="reveal-wrapper">
+                        <span class="reveal-text font-serif text-7xl lg:text-8xl block mb-4">1000m</span>
+                    </div>
+                    <p class="text-gray-400 text-lg font-light leading-relaxed">Signal range extension for large open floor spaces, warehouses, and parking garages.</p>
+                </div>
+
+                <!-- Stat 2 -->
+                <div class="bg-ink p-12 lg:p-16 hover:bg-white/5 transition-colors group border-b lg:border-b-0 lg:border-r border-white/10 hover-trigger relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-8 opacity-20 group-hover:opacity-100 transition-opacity transform group-hover:rotate-45 duration-500">
+                        <i class="fa-solid fa-arrow-up-right text-3xl"></i>
+                    </div>
+                    <i class="fa-solid fa-bolt text-4xl mb-12 text-accent"></i>
+                    <div class="reveal-wrapper">
+                        <span class="reveal-text font-serif text-7xl lg:text-8xl block mb-4">SPoE</span>
+                    </div>
+                    <p class="text-gray-400 text-lg font-light leading-relaxed">Single Pair Power over Ethernet. Eliminate extra cabling by powering devices directly.</p>
+                </div>
+
+                <!-- Stat 3 -->
+                <div class="bg-ink p-12 lg:p-16 hover:bg-white/5 transition-colors group hover-trigger relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-8 opacity-20 group-hover:opacity-100 transition-opacity transform group-hover:rotate-45 duration-500">
+                        <i class="fa-solid fa-arrow-up-right text-3xl"></i>
+                    </div>
+                    <i class="fa-solid fa-network-wired text-4xl mb-12 text-accent"></i>
+                    <div class="reveal-wrapper">
+                        <span class="reveal-text font-serif text-7xl lg:text-8xl block mb-4">10Mb/s</span>
+                    </div>
+                    <p class="text-gray-400 text-lg font-light leading-relaxed">Full duplex throughput. Facilitating networking for billions of forecasted sensors.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- PRODUCTS GRID -->
+    <section id="products" class="py-32 bg-paper px-6 lg:px-12">
+        <div class="max-w-[1600px] mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-24">
+                <div>
+                    <span class="block text-accent font-bold uppercase tracking-widest text-xs mb-4 fade-up">Hardware Catalogue</span>
+                    <h2 class="font-serif text-5xl lg:text-7xl fade-up">Engineered<br>Solutions.</h2>
+                </div>
+                <div class="hidden md:block fade-up">
+                    <p class="text-gray-500 text-right max-w-xs">Industrial-grade components designed for the edge.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-24">
+                
+                <!-- Card 1: Switches -->
+                <div class="group cursor-none hover-trigger">
+                    <div class="img-container aspect-[5/4] mb-8 relative bg-gray-200">
+                        <!-- Updated: Server/Switch Close up -->
+                        <img src="./assets/image/SPE-Switches.jpg" 
+                             class="parallax-img grayscale group-hover:grayscale-0 transition-all duration-700" 
+                             alt="SPE Switches">
+                    </div>
+                    <div class="flex justify-between items-start border-t border-gray-300 pt-8 anim-border-top">
+                        <div class="max-w-md">
+                            <span class="text-xs font-mono text-gray-400 mb-2 block">SERIES: SW-X</span>
+                            <h3 class="font-serif text-4xl mb-4 group-hover:text-accent transition-colors">SPE Switches</h3>
+                            <p class="text-gray-600 font-light">Low power switching infrastructure for process control. Robust DIN-rail mountable designs.</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full border border-gray-300 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-2">
+                            <i class="fa-solid fa-arrow-right text-accent"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: End Points (Offset Layout) -->
+                <div class="group cursor-none hover-trigger md:mt-24">
+                    <div class="img-container aspect-[5/4] mb-8 relative bg-gray-200">
+                        <!-- Updated: Automation Sensor/Robotic Arm -->
+                        <img src="./assets/image/End-Point-Devices.jpg" 
+                             class="parallax-img grayscale group-hover:grayscale-0 transition-all duration-700" 
+                             alt="End Point Devices">
+                    </div>
+                    <div class="flex justify-between items-start border-t border-gray-300 pt-8 anim-border-top">
+                        <div class="max-w-md">
+                            <span class="text-xs font-mono text-gray-400 mb-2 block">SERIES: EP-01</span>
+                            <h3 class="font-serif text-4xl mb-4 group-hover:text-accent transition-colors">End Point Devices</h3>
+                            <p class="text-gray-600 font-light">Smart sensors and actuators with plug-and-play simplicity. Direct IP addressability.</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full border border-gray-300 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-2">
+                            <i class="fa-solid fa-arrow-right text-accent"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Converters -->
+                <div class="group cursor-none hover-trigger">
+                    <div class="img-container aspect-[5/4] mb-8 relative bg-gray-200">
+                        <!-- Updated: Cabling/Fiber detail -->
+                        <img src="./assets/image/Media-Converters.jpg" 
+                             class="parallax-img grayscale group-hover:grayscale-0 transition-all duration-700" 
+                             alt="Media Converters">
+                    </div>
+                    <div class="flex justify-between items-start border-t border-gray-300 pt-8 anim-border-top">
+                        <div class="max-w-md">
+                            <span class="text-xs font-mono text-gray-400 mb-2 block">SERIES: MC-PRO</span>
+                            <h3 class="font-serif text-4xl mb-4 group-hover:text-accent transition-colors">Media Converters</h3>
+                            <p class="text-gray-600 font-light">Seamlessly adapt BASE-T/PoE legacy systems to modern Single Pair Ethernet infrastructure.</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full border border-gray-300 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-2">
+                            <i class="fa-solid fa-arrow-right text-accent"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Custom Engineering -->
+                <div class="group cursor-none hover-trigger md:mt-24">
+                    <div class="img-container aspect-[5/4] mb-8 relative bg-white flex flex-col justify-center items-center text-center p-12 border border-gray-200">
+                        <div class="mb-8">
+                             <i class="fa-solid fa-compass-drafting text-6xl text-gray-300 group-hover:text-accent transition-colors duration-500"></i>
+                        </div>
+                        <h4 class="font-serif text-3xl mb-4">Custom Solutions</h4>
+                        <p class="text-gray-500 max-w-sm mb-8">Bespoke engineering for unique industrial environments and proprietary protocols.</p>
+                        <span class="inline-block border-b-2 border-black pb-1 uppercase text-xs font-bold tracking-widest group-hover:text-accent group-hover:border-accent transition-colors">Contact Engineering</span>
+                    </div>
+                    <div class="flex justify-between items-start border-t border-gray-300 pt-8 anim-border-top">
+                        <div class="max-w-md">
+                            <span class="text-xs font-mono text-gray-400 mb-2 block">SERVICE: R&D</span>
+                            <h3 class="font-serif text-4xl mb-4 group-hover:text-accent transition-colors">Engineering</h3>
+                            <p class="text-gray-600 font-light">Partner with our R&D team to build the exact specification you require.</p>
+                        </div>
+                         <div class="w-12 h-12 rounded-full border border-gray-300 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity transform group-hover:translate-x-2">
+                            <i class="fa-solid fa-arrow-right text-accent"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- CASE STUDY PARALLAX -->
+    <section id="insights" class="relative py-32 bg-white overflow-hidden">
+        <div class="max-w-[1600px] mx-auto px-6 lg:px-12 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                
+                <div class="order-2 lg:order-1">
+                    <div class="reveal-wrapper">
+                         <span class="reveal-text block text-accent font-bold uppercase tracking-widest text-xs mb-6">BICSI Fall Conference</span>
+                    </div>
+                    <div class="reveal-wrapper">
+                        <h2 class="reveal-text font-serif text-6xl lg:text-8xl mb-8 leading-tight">Live<br>Demonstration.</h2>
+                    </div>
+                    <p class="text-xl text-gray-600 mb-10 font-light fade-up max-w-lg leading-relaxed">
+                        We demonstrated a working SPE system recorded by Cabling Installation Magazine. Proving the technology in real-world scenarios.
+                    </p>
+                    <a href="#" class="group inline-flex items-center gap-4 text-sm font-bold uppercase tracking-widest hover:text-accent transition-colors fade-up hover-trigger cursor-none">
+                        <div class="w-12 h-12 rounded-full bg-ink text-white flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-play ml-1"></i>
+                        </div>
+                        Watch Full Video
+                    </a>
+                </div>
+
+                <div class="order-1 lg:order-2">
+                    <div class="relative w-full h-[70vh] overflow-hidden rounded-sm">
+                        <!-- Case Study Image: Large Warehouse/Industrial Hall -->
+                        <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" class="absolute inset-0 w-full h-full object-cover parallax-scroll-img grayscale hover:grayscale-0 transition-all duration-700">
+                        <div class="absolute inset-0 bg-black/10"></div>
+                        <div class="absolute bottom-8 left-8 bg-white/90 backdrop-blur p-8 max-w-xs shadow-xl fade-up">
+                            <p class="font-serif text-2xl italic">"The Future of Industrial IoT"</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer id="contact" class="bg-ink text-white pt-32 pb-12 px-6 lg:px-12 rounded-t-[3rem] -mt-12 relative z-20">
+        <div class="max-w-[1600px] mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-32">
+                <div>
+                    <h2 class="font-serif text-6xl lg:text-8xl mb-12">Let's build<br><span class="text-gray-600">the network.</span></h2>
+                    <a href="mailto:cdiminico@sentekse.com" class="text-2xl lg:text-4xl border-b border-gray-700 pb-2 hover:text-accent hover:border-accent transition-colors hover-trigger inline-block mb-6">
+                        cdiminico@sentekse.com
+                    </a>
+                    <p class="text-gray-400 font-sans text-lg tracking-widest">+1 978 758 0764</p>
+                </div>
+                <div class="flex flex-col justify-end items-start lg:items-end">
+                    <p class="text-xl max-w-md text-right text-gray-400 font-light leading-relaxed">
+                        Design and manufacture of Single Pair Ethernet devices for Industrial process control and building automation.
+                    </p>
+                    <div class="mt-12 flex gap-4">
+                        <a href="#" class="w-12 h-12 rounded-full border border-gray-700 flex items-center justify-center hover:bg-white hover:text-black transition-all hover-trigger">
+                            <i class="fa-brands fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="w-12 h-12 rounded-full border border-gray-700 flex items-center justify-center hover:bg-white hover:text-black transition-all hover-trigger">
+                            <i class="fa-brands fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs font-bold uppercase tracking-widest text-gray-500">
+                <p>&copy; 2026 SenTekse.</p>
+                <div class="flex gap-8 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-white transition-colors hover-trigger">Privacy</a>
+                    <a href="#" class="hover:text-white transition-colors hover-trigger">Terms</a>
+                    <a href="#" class="hover:text-white transition-colors hover-trigger">Sitemap</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- GSAP ANIMATION SCRIPT -->
+    <script>
+        // Wait for DOM
+        document.addEventListener("DOMContentLoaded", (event) => {
+            
+            // Register ScrollTrigger
+            gsap.registerPlugin(ScrollTrigger);
+
+            // 1. Text Reveals (Mask Slide Up - Improved for smoothness)
+            const revealText = document.querySelectorAll('.reveal-text');
+            revealText.forEach(text => {
+                gsap.to(text, {
+                    autoAlpha: 1, // Handles visibility + opacity
+                    y: 0,
+                    duration: 1.4,
+                    ease: "power4.out",
+                    scrollTrigger: {
+                        trigger: text,
+                        start: "top 85%", 
+                        toggleActions: "play none none reverse"
+                    }
+                });
+            });
+
+            // 2. Fade Up Elements
+            const fadeUps = document.querySelectorAll('.fade-up');
+            fadeUps.forEach(el => {
+                gsap.fromTo(el, 
+                    { autoAlpha: 0, y: 60 },
+                    { 
+                        autoAlpha: 1, 
+                        y: 0, 
+                        duration: 1.2, 
+                        ease: "power3.out",
+                        scrollTrigger: {
+                            trigger: el,
+                            start: "top 90%"
+                        }
+                    }
+                );
+            });
+
+            // 3. Line/Border Drawing Animation
+            const animBorders = document.querySelectorAll('.anim-border-top');
+            animBorders.forEach(border => {
+                gsap.fromTo(border,
+                    { width: "0%" },
+                    { 
+                        width: "100%", 
+                        duration: 1.5, 
+                        ease: "expo.inOut",
+                        scrollTrigger: {
+                            trigger: border,
+                            start: "top 85%"
+                        }
+                    }
+                );
+            });
+            
+            const animBordersBottom = document.querySelectorAll('.anim-border-bottom');
+            animBordersBottom.forEach(border => {
+                gsap.fromTo(border,
+                    { width: "0%" },
+                    { 
+                        width: "100%", 
+                        duration: 1.5, 
+                        ease: "expo.inOut",
+                        scrollTrigger: {
+                            trigger: border,
+                            start: "top 85%"
+                        }
+                    }
+                );
+            });
+
+            // 4. Parallax Images in Cards (Smoother Scrub)
+            const parallaxImages = document.querySelectorAll('.parallax-img');
+            parallaxImages.forEach(img => {
+                gsap.to(img, {
+                    scale: 1, // Smooth zoom out
+                    y: "15%", // Move image down slightly as we scroll
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: img.parentElement,
+                        start: "top bottom",
+                        end: "bottom top",
+                        scrub: 1 // Increased scrub value for smoother effect
+                    }
+                });
+            });
+
+            // 5. Large Parallax Image (Case Study)
+            const largeParallax = document.querySelector('.parallax-scroll-img');
+            if(largeParallax) {
+                gsap.fromTo(largeParallax, 
+                    { y: "-10%" },
+                    { 
+                        y: "10%",
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: largeParallax.parentElement,
+                            start: "top bottom",
+                            end: "bottom top",
+                            scrub: 1
+                        }
+                    }
+                );
+            }
+
+            // 6. Custom Cursor Logic
+            const cursorDot = document.querySelector('.cursor-dot');
+            const cursorOutline = document.querySelector('.cursor-outline');
+            const hoverTriggers = document.querySelectorAll('.hover-trigger');
+
+            // Only initialize cursor on non-touch devices
+            if (window.matchMedia("(pointer: fine)").matches) {
+                
+                window.addEventListener("mousemove", function (e) {
+                    const posX = e.clientX;
+                    const posY = e.clientY;
+
+                    // Dot follows instantly
+                    cursorDot.style.left = `${posX}px`;
+                    cursorDot.style.top = `${posY}px`;
+
+                    // Outline follows with smooth delay
+                    gsap.to(cursorOutline, {
+                        x: posX,
+                        y: posY,
+                        duration: 0.2,
+                        ease: "power2.out"
+                    });
+                });
+
+                // Hover effects
+                hoverTriggers.forEach(trigger => {
+                    trigger.addEventListener("mouseenter", () => {
+                        document.body.classList.add("hovering");
+                        gsap.to(cursorOutline, { scale: 1.5, duration: 0.3 });
+                        gsap.to(cursorDot, { autoAlpha: 0, duration: 0.2 }); 
+                    });
+                    trigger.addEventListener("mouseleave", () => {
+                        document.body.classList.remove("hovering");
+                        gsap.to(cursorOutline, { scale: 1, duration: 0.3 });
+                        gsap.to(cursorDot, { autoAlpha: 1, duration: 0.2 });
+                    });
+                });
+            } else {
+                // If touch device, remove cursor elements
+                cursorDot.style.display = 'none';
+                cursorOutline.style.display = 'none';
+                document.body.style.cursor = 'auto';
+            }
+
+            // Refresh ScrollTrigger on load
+            window.addEventListener("load", () => {
+                ScrollTrigger.refresh();
+            });
+
+        });
+    </script>
+</body>
+</html>
